@@ -1,0 +1,2 @@
+cd case-javascript
+./make server --port 81 --random  </dev/null &>/dev/null &

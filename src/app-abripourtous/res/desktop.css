@@ -1,0 +1,29 @@
+body
+{
+ font-size:2vw;
+}
+
+.pad-left
+{
+ padding-left:4vw;
+}
+
+.pad-right
+{
+ padding-right:4vw;
+}
+
+.spacer
+{
+ height:2vw;
+}
+
+#logo
+{
+ width:20vw;
+}
+
+#pot a
+{
+ border-radius:1vw;
+}

@@ -1,0 +1,30 @@
+*
+{
+ box-sizing:border-box;
+}
+
+/*div
+{
+ border:1px solid red;
+}*/
+
+html
+{
+ padding:4vw;
+ font-family:monospace;
+}
+
+.center
+{
+ text-align:center;
+}
+
+#pot a
+{
+ display:block;
+ padding:2vw;
+ font-weight:bold;
+ text-decoration:none;
+ color:white;
+ background-color:limegreen;
+}
