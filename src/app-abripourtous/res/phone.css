@@ -1,0 +1,80 @@
+*
+{
+ text-size-adjust:none;
+}
+
+html
+{
+ padding:5.6vw;
+}
+
+body
+{
+ font-size:5.6vw;
+}
+
+button
+{
+ padding:5.6vw;
+ font-size:5.6vw;
+}
+
+.small
+{
+ width:10vw;
+}
+
+.medium
+{
+ width:20vw;
+}
+
+.large
+{
+ width:40vw;
+}
+
+.spacer
+{
+ height:5.6vw;
+}
+
+.pad
+{
+ padding:5.6vw;
+}
+
+.pad-left
+{
+ padding-left:5.6vw;
+}
+
+.pad-right
+{
+ padding-right:5.6vw;
+}
+
+.pad-top
+{
+ padding-top:5.6vw;
+}
+
+.pad-bottom
+{
+ padding-bottom:5.6vw;
+}
+
+.border
+{
+ border:0.4vw solid gray;
+}
+
+#logo
+{
+ width:45vw;
+}
+
+#phone
+{
+ width:16vw;
+}
