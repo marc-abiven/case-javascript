@@ -1,0 +1,29 @@
+2025-04-15
+ list users
+ list pages
+  with users
+ list posts
+  with user
+  with categories
+ chargement...
+  blink
+  progress bar x/19s
+ save localStorage
+  timeout=1h
+ merge all nodes
+  node
+   uid
+   uparent
+   type
+    page
+    post
+    category
+    user
+   content
+    can be a list of links
+    for categories
+    for users
+ list youtube videos
+ safari
+  use /usr/share/fonts/truetype/liberation2/LiberationMono-Regular.ttf
+

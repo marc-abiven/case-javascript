@@ -1,0 +1,75 @@
+html
+{
+ padding:1.4vw;
+}
+
+body
+{
+ font-size:1.4vw;
+}
+
+button
+{
+ padding:1.4vw;
+ font-size:1.4vw;
+}
+
+.small
+{
+ width:10vw;
+}
+
+.medium
+{
+ width:20vw;
+}
+
+.large
+{
+ width:40vw;
+}
+
+.spacer
+{
+ height:1.4vw;
+}
+
+.pad
+{
+ padding:1.4vw;
+}
+
+.pad-left
+{
+ padding-left:1.4vw;
+}
+
+.pad-right
+{
+ padding-right:1.4vw;
+}
+
+.pad-top
+{
+ padding-top:1.4vw;
+}
+
+.pad-bottom
+{
+ padding-bottom:1.4vw;
+}
+
+.border
+{
+ border:0.1vw solid gray;
+}
+
+#logo
+{
+ width:20vw;
+}
+
+#phone
+{
+ width:4vw;
+}
