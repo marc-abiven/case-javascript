@@ -1,0 +1,48 @@
+2025-04-24
+ debug restart
+  no full scroll
+  pause
+  le fps baisse
+ debug jerky
+ measure text
+  https://gist.github.com/remy/784508
+ print
+  #channel
+  range
+   mV
+ test requestAnimationFrame
+ pause button
+ script send mail
+  hostname -I
+ draw curve in backbuffer
+  super sampling
+  for blinking
+ record replay eeg
+ sample limit
+  button
+  4s
+  16s
+  32s
+ graphical log
+ window.onerror
+  skip events
+  timers
+  double_click
+ pause
+  keep the data 
+ display status
+  connected
+  offline
+   in red   
+ button stop/resume
+ axis
+  mV
+  s
+ record eeg
+ binary http
+ bootstrap make.js
+ detect peak
+  print label with mV
+ https
+ round-robin
+  like a monitor

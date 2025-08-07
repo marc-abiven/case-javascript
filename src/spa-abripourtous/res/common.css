@@ -1,0 +1,97 @@
+*
+{
+ box-sizing:border-box;
+}
+
+/*div
+{
+ border:1px solid red;
+}*/
+
+html
+{
+ font-family:monospace;
+}
+
+body
+{
+ margin:0;
+}
+
+table
+{
+ border-collapse:collapse;
+}
+
+td
+{
+ vertical-align:top;
+}
+
+a
+{
+ text-decoration:none;
+ color:blue;
+}
+
+a:hover
+{
+ color:white;
+ background-color:red;
+}
+
+button
+{
+ color:white;
+ background-color:limegreen;
+}
+
+.full-width
+{
+ width:100%;
+}
+
+.center
+{
+ text-align:center;
+}
+
+.vertical-center
+{
+ vertical-align:middle;
+}
+
+.float
+{
+ float:left;
+}
+
+.white
+{
+ color:white;
+}
+
+.gray
+{
+ color:whitesmoke;
+}
+
+.background-white
+{
+ background-color:white;
+}
+
+.background-gray
+{
+ background-color:whitesmoke;
+}
+
+#pot
+{
+ width:100%;
+ border:0.1vw solid green;
+ font-weight:bold;
+ color:white;
+ background-color:limegreen;
+ cursor:pointer;
+}
