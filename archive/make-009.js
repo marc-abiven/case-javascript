@@ -1,0 +1,2891 @@
+function bracket(x)
+{
+ check(is_str,x)
+ 
+ return concat("[",x,"]")
+}
+function abs(x)
+{
+ check(is_num,x)
+ return Math.abs(x)
+}
+function add(x,y,...z)
+{
+ check(is_num,x)
+ check(is_num,y)
+ const r=x+y
+ if(is_full(z))
+  return add(r,...z)
+ return r
+}
+function append(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ for(const v of y)
+ {
+  push(x,v)
+ }
+}
+function arr(...x)
+{
+ return [...x]
+}
+function asc(x)
+{
+ check(is_str,x)
+ check(is_single,x)
+ return x.charCodeAt(0)
+}
+function at(x,y,z)
+{
+ check(is_vec,x)
+ check(is_uint,y)
+ const n=dec(x.length)
+ check(between,y,0,n)
+ if(is_undef(z))
+  return x[y]
+ x[y]=z
+}
+function back(x,y,z)
+{
+ check(is_vec,x)
+ if(is_undef(y))
+  return back(x,0)
+ check(is_uint,y)
+ let n=sub(x.length,y)
+ n=dec(n)
+ if(is_undef(z))
+  return at(x,n)
+ at(x,n,z)
+}
+function backtrace()
+{
+ const error=new Error
+ log(error.stack)
+}
+function base36_decode(x)
+{
+ check(is_str,x)
+ let r=""
+ const a=explode(x)
+ while(is_full(a))
+ {
+  const a2=slice_l(a,4)
+  shift(a,4)
+  const s=implode(a2)
+  const n=Number.parseInt(s,36)
+  const range=mul(256,256)
+  check(is_uint,n)
+  check(lte,n,range)
+  const c=chr(n)
+  r=concat(r,c)
+ }
+ return r
+}
+function base36_encode(x)
+{
+ check(is_str,x)
+ let r=""
+ for(const v of x)
+ {
+  const n=asc(v)
+  let s=n.toString(36)
+  s=pad_l(s,"0",4)
+  r=concat(r,s)
+ }
+ return r
+}
+function between(x,y,z)
+{
+ check(is_num,x)
+ check(is_num,y)
+ check(is_num,z)
+ check(gte,z,y)
+ if(lt(x,y))
+  return false
+ if(gt(x,z))
+  return false
+ return true
+}
+function byte_size(x)
+{
+ check(is_uint,x)
+ check(gte,x,0)
+ const kb=1024
+ const mb=mul(1024,kb)
+ const gb=mul(1024,mb)
+ const tb=mul(1024,gb)
+ if(lt(x,kb))
+ {
+  const s=to_fixed(x)
+  return concat(s,"b")
+ }
+ if(lt(x,mb))
+ {
+  const n1=div(x,kb)
+  const n2=trunc(n1)
+  const s=to_fixed(n2)
+  return concat(s,"Kb")
+ }
+ if(lt(x,gb))
+ {
+  const n1=div(x,mb)
+  const n2=trunc(n1)
+  const s=to_fixed(n2)
+  return concat(s,"Mb")
+ }
+ if(lt(x,tb))
+ {
+  const n1=div(x,gb)
+  const n2=trunc(n1)
+  const s=to_fixed(n2)
+  return concat(s,"Gb")
+ }
+ const n1=div(x,tb)
+ const n2=trunc(n1)
+ const s=to_fixed(n2)
+ return concat(s,"Tb")
+}
+function check(x,...y)
+{
+ if(is_true(x))
+ {
+  if(is_empty(y))
+   return
+ }
+ else if(is_fn(x))
+ {
+  const b=x(...y)
+  if(is_true(b))
+   return
+ }
+ stop()
+}
+function chr(x)
+{
+ check(is_uint,x)
+ return String.fromCharCode(x)
+}
+function clear(x)
+{
+ check(is_arr,x)
+ x.splice(0)
+}
+function clone(x)
+{
+ check(is_def,x)
+ return structuredClone(x)
+}
+function cmp(x,y)
+{
+ check(is_def,x)
+ check(is_def,y)
+ if(x>y)
+  return 1
+ if(x<y)
+  return -1
+ return 0
+}
+function collate(x)
+{
+ check(is_arr,x)
+ function is_delimited(x)
+ {
+  if(same(x,"_"))
+   return false
+  if(is_punct(x))
+   return true
+  if(is_space(x))
+   return true
+  return false
+ }
+ const a=arr()
+ for(const v of x)
+ {
+  if(is_empty(a))
+  {
+   push(a,v)
+   continue
+  }
+  const left1=back(a)
+  const left2=back(left1)
+  const right1=v
+  const right2=front(right1)
+  if(is_delimited(left2))
+  {
+  }
+  else if(is_delimited(right2))
+  {
+  }
+  else
+  {
+   push(a,right1)
+   continue
+  }
+  const s=concat(left1,right1)
+  drop(a)
+  push(a,s)
+ }
+ return join(a," ")
+}
+function concat(...x)
+{
+ return implode(x)
+}
+function contain(x,y)
+{
+ check(is_vec,x)
+ if(is_str(x))
+  check(is_str,y)
+ check(is_def,y)
+ return x.includes(y)
+}
+function date_get(x)
+{
+ if(is_undef(x))
+ {
+  const n=time_get()
+  return date_get(n)
+ }
+ check(is_num,x)
+ const n=mul(x,1000)
+ const o=new Date(n)
+ const y=o.getFullYear()
+ let m=o.getMonth()
+ m=inc(m)
+ m=pad_l(m,"0",2)
+ let d=o.getDate()
+ d=pad_l(d,"0",2)
+ return concat(y,"/",m,"/",d)
+}
+function dec(x)
+{
+ check(is_num,x)
+ return sub(x,1)
+}
+function different(x,y)
+{
+ return x!==y
+}
+function div(x,y,...z)
+{
+ check(is_num,x)
+ check(is_num,y)
+ check(different,y,0)
+ const r=x/y
+ if(is_full(z))
+  return div(r,...z)
+ return r
+}
+function drop(x,y)
+{
+ check(is_arr,x)
+ if(is_undef(y))
+  return drop(x,1)
+ pop(x,y)
+}
+function dump(x)
+{
+ check(is_def,x)
+ if(is_node())
+ {
+  log(util.inspect(x,false,null,true))
+ }
+ else if(is_browser())
+ {
+  const s=to_dump(x)
+  log(s)
+ }
+ else
+  stop()
+}
+function dup(x)
+{
+ check(is_container,x)
+ if(is_arr(x))
+  return slice(x,0)
+ else if(is_obj(x))
+ {
+  const r=obj()
+  merge(r,x)
+  return r
+ }
+ else
+  stop()
+}
+function every(x,y)
+{
+ check(is_arr,x)
+ check(is_fn,y)
+ for(const v of x)
+ {
+  if(!y(v))
+   return false
+ }
+ return true
+}
+function explode(x)
+{
+ check(is_str,x)
+ const r=arr()
+ for(const v of x)
+ {
+  push(r,v)
+ }
+ return r
+}
+function extract(x,y)
+{
+ check(is_arr,x)
+ check(is_def,y)
+ let r=false
+ const a=dup(x)
+ clear(x)
+ for(const v of a)
+ {
+  if(same(v,y))
+   r=true
+  else
+   push(x,v)
+ }
+ return r
+}
+function find(x,y)
+{
+ check(is_arr,x)
+ check(is_def,y)
+ for(const k in x)
+ {
+  const i=to_i(k)
+  const v=at(x,i)
+  if(same(v,y))
+   return i
+ }
+ return -1
+}
+function front(x)
+{
+ check(is_vec,x)
+ return at(x,0)
+}
+function get(x,y)
+{
+ check(is_obj,x)
+ check(is_str,y)
+ check(has,x,y)
+ return x[y]
+}
+function gt(x,y)
+{
+ check(is_num,x)
+ check(is_num,y)
+ return x>y
+}
+function gte(x,y)
+{
+ check(is_num,x)
+ check(is_num,y)
+ return x>=y
+}
+function has(x,y)
+{
+ check(is_obj,x)
+ check(is_str,y)
+ return y in x
+}
+function head(x,y)
+{
+ check(is_arr,x)
+ check(is_uint,y)
+ if(lt(x.length,y))
+  return dup(x)
+ return slice_l(x,y)
+}
+function implode(x)
+{
+ check(is_arr,x)
+ return join(x,"")
+}
+function inc(x)
+{
+ check(is_num,x)
+ return add(x,1)
+}
+function indent(x)
+{
+ check(is_str,x)
+ const a=arr()
+ for(const v of split(x))
+ {
+  let s=trim_r(v)
+  if(is_empty(s))
+   push(a,s)
+  else
+  {
+   s=concat(" ",s)
+   push(a,s)
+  }
+ }
+ return join(a)
+}
+function is_access(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ const a=split(x,".")
+ if(is_single(a))
+  return false
+ return every(a,is_identifier)
+}
+function is_alnum(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ for(const v of x)
+ {
+  if(same(v,"_"))
+   ;
+  else if(is_alpha(v))
+   ;
+  else if(is_digit(v))
+   ;
+  else
+   return false
+ }
+ return true
+}
+function is_alpha(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ for(const v of x)
+ {
+  if(is_lower(v))
+   ;
+  else if(is_upper(v))
+   ;
+  else
+   return false
+ }
+ return true
+}
+function is_arr(x)
+{
+ return Array.isArray(x)
+}
+function is_blank(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return true
+ if(is_space(x))
+  return true
+ return false
+}
+function is_browser()
+{
+ try
+ {
+  window
+ }
+ catch
+ {
+  return false
+ }
+ return true
+}
+function is_comment(x)
+{
+ if(!is_ln(x))
+  return false
+ return match_l(x,"//")
+}
+function is_container(x)
+{
+ if(is_arr(x))
+  return true
+ if(is_obj(x))
+  return true
+ return false
+}
+function is_cool(x)
+{
+ if(is_num(x))
+  return true
+ if(is_str(x))
+  return true
+ return false
+}
+function is_def(x)
+{
+ return !is_undef(x)
+}
+function is_digit(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ for(const v of x)
+ {
+  if(!contain(digit,v))
+   return false
+ }
+ return true
+}
+function is_empty(x)
+{
+ if(is_vec(x))
+  return same(x.length,0)
+ return false
+}
+function is_false(x)
+{
+ return same(x,false)
+}
+function is_fn(x)
+{
+ const s=typeof x
+ if(different(s,"function"))
+  return false
+ if(same(x.constructor.name,"GeneratorFunction"))
+  return false
+ return true
+}
+function is_fragment(x)
+{
+ if(!is_str(x))
+  return true
+ if(is_alnum(x))
+  return true
+ if(is_space(x))
+  return true
+ return false
+}
+function is_full(x)
+{
+ if(is_vec(x))
+  return !is_empty(x)
+ return false
+}
+function is_gn(x)
+{
+ const s=typeof x
+ if(different(s,"function"))
+  return false
+ if(different(x.constructor.name,"GeneratorFunction"))
+  return false
+ return true
+}
+function is_identifier(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ const s=front(x)
+ if(same(s,"_"))
+  ;
+ else if(is_alpha(s))
+  ;
+ else
+  return false
+ for(const v of x)
+ {
+  if(!is_alnum(v))
+   return false
+ }
+ return true
+}
+function is_int(x)
+{
+ return Number.isInteger(x)
+}
+function is_json(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ try
+ {
+  json_decode(x)
+ }
+ catch
+ {
+  return false
+ }
+ return true
+}
+function is_last(x,y)
+{
+ check(is_arr,x)
+ check(is_uint,y)
+ const n=dec(x.length)
+ return same(n,y)
+}
+function is_lisp(x)
+{
+ if(!is_str(x))
+  return false
+ const a=split(x,"-")
+ return every(a,is_alnum)
+}
+function is_lit_char(x)
+{
+ if(!is_str(x))
+  return false
+ if(!match_l(x,"'"))
+  return false
+ if(!match_r(x,"'"))
+  return false
+ let s=strip_l(x,"'")
+ s=strip_r(s1,"'")
+ if(is_empty(s))
+  return false
+ s=concat("\"",s,"\"")
+ return is_lit(s)
+}
+function is_lit(x)
+{
+ if(!is_str(x))
+  return false
+ if(!is_json(x))
+  return false
+ const v=json_decode(x)
+ if(!is_str(v))
+  return false
+ const s=json_encode(v)
+ return same(s,x)
+}
+function is_ln(x)
+{
+ if(is_str(x))
+  return !is_txt(x)
+ return false
+}
+function is_lower(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ for(const v of x)
+ {
+  if(!contain(lower,v))
+   return false
+ }
+ return true
+}
+function is_many(x)
+{
+ if(is_vec(x))
+  return gt(x.length,1)
+ return false
+}
+function is_member(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ if(is_identifier(x))
+  return true
+ if(is_lit(x))
+  return true
+ return false
+}
+function is_name(x)
+{
+ if(is_identifier(x))
+  return true
+ if(is_access(x))
+  return true
+ if(is_tuple(x))
+  return true
+ return false
+}
+function is_node()
+{
+ return !is_browser()
+}
+function is_noun(x)
+{
+ if(is_identifier(x))
+  return true
+ if(is_access(x))
+  return true
+ return false
+}
+function is_null(x)
+{
+ return same(x,null)
+}
+function is_num(x)
+{
+ if(Number.isNaN(x))
+  return false
+ if(same(x,Number.NEGATIVE_INFINITY))
+  return false
+ if(same(x,Number.POSITIVE_INFINITY))
+  return false
+ const s=typeof x
+ return same(s,"number")
+}
+function is_numeric(x)
+{
+ if(!is_str(x))
+  return false
+ if(!is_json(x))
+  return false
+ const v=json_decode(x)
+ if(!is_num(v))
+  return false
+ const s=json_encode(v)
+ return same(s,x)
+}
+function is_obj(x)
+{
+ if(is_null(x))
+  return false
+ const s=typeof x
+ return same(s,"object")
+}
+function is_pair(x)
+{
+ if(!is_vec(x))
+  return false
+ return same(x.length,2)
+}
+function is_punct(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ const s="!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+ for(const v of x)
+ {
+  if(!contain(s,v))
+   return false
+ }
+ return true
+}
+function is_single(x)
+{
+ if(is_vec(x))
+  return same(x.length,1)
+ return false
+}
+function is_space(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ const s=trim(x)
+ return is_empty(s)
+}
+function is_str(x)
+{
+ const s=typeof x
+ return same(s,"string")
+}
+function is_token(x)
+{
+ if(is_alnum(x))
+  return true
+ if(is_access(x))
+  return true
+ if(is_tuple(x))
+  return true
+ if(is_numeric(x))
+  return true
+ if(is_lit(x))
+  return true
+ if(is_lit_char(x))
+  return true
+ if(is_comment(x))
+  return true
+ return false
+}
+function is_trivia(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_space(x))
+  return true
+ if(is_comment(x))
+  return true
+ return false
+}
+function is_true(x)
+{
+ return same(x,true)
+}
+function is_tuple(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ const a=split(x,":")
+ if(is_single(a))
+  return false
+ for(const v of a)
+ {
+  if(!is_member(v))
+   return false
+ }
+ return true
+}
+//~ function is_tuple(x)
+//~ {
+ //~ if(!is_str(x))
+  //~ return false
+ //~ if(is_empty(x))
+  //~ return false
+ //~ const a=scan(x,is_member)
+ //~ if(is_single(a))
+  //~ return false
+ //~ const s=shift(a)
+ //~ if(!is_member(s))
+  //~ return false
+ //~ while(is_full(a))
+ //~ {
+  //~ let s=shift(a)
+  //~ if(different(s,":"))
+   //~ return false
+  //~ if(is_empty(a))
+   //~ return false
+  //~ s=shift(a)
+  //~ if(!is_member(s))
+   //~ return false
+ //~ }
+ //~ return true
+//~ }
+function is_txt(x)
+{
+ if(is_str(x))
+  return contain(x,"\n")
+ return false
+}
+function is_uint(x)
+{
+ if(is_int(x))
+  return gte(x,0)
+ return false
+}
+function is_undef(x)
+{
+ return same(x,undefined)
+}
+function is_upper(x)
+{
+ if(!is_str(x))
+  return false
+ if(is_empty(x))
+  return false
+ for(const v of x)
+ {
+  if(!contain(upper,v))
+   return false
+ }
+ return true
+}
+function is_url(x)
+{
+ if(!is_ln(x))
+  return false
+ if(match_l(x,"http://"))
+  return true
+ if(match_l(x,"https://"))
+  return true
+ return false
+}
+function is_vec(x)
+{
+ if(is_str(x))
+  return true
+ if(is_arr(x))
+  return true
+ return false
+}
+function join(x,y)
+{
+ check(is_arr,x)
+ if(is_undef(y))
+  return join(x,"\n")
+ check(is_str,y)
+ return x.join(y)
+}
+function json_decode(x)
+{
+ check(is_str,x)
+ return JSON.parse(x)
+}
+function json_encode(x)
+{
+ check(is_def,x)
+ return JSON.stringify(x)
+}
+function log(...x)
+{
+ console.log(...x)
+}
+function lt(x,y)
+{
+ check(is_num,x)
+ check(is_num,y)
+ return x<y
+}
+function lte(x,y)
+{
+ check(is_num,x)
+ check(is_num,y)
+ return x<=y
+}
+function main()
+{
+ const _=arr()
+ {
+  const parameters=_
+  {
+   function pump()
+   {
+    if(is_fn(init))
+    {
+     init(...parameters)
+     profile()
+    }
+    else if(is_gn(init))
+    {
+     const _=init(...parameters)
+     {
+      const generator=_
+      {
+       function on_timer()
+       {
+        const _=generator.next()
+        {
+         const iterator=_
+         {
+          if(iterator.done)
+          {
+           profile()
+           return
+          }
+          time_timeout(on_timer)
+         }
+        }
+       }
+       on_timer()
+      }
+     }
+    }
+   }
+   function profile()
+   {
+    const _=time_now()
+    {
+     const n=_
+     {
+      const _=get_name()
+      {
+       const name=_
+       {
+        const _=to_fixed(n)
+        {
+         const s=_
+         {
+          const _=concat(s,"s")
+          {
+           const s=_
+           {
+            log("profile",name,s)
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+   function get_name()
+   {
+    if(is_node())
+    {
+     const _=at(process.argv,1)
+     {
+      const file=_
+      {
+       const _=path_file(file)
+       {
+        const file=_
+        {
+         return replace(file,".","-")
+        }
+       }
+      }
+     }
+    }
+    else if(is_browser())
+    {
+     const _=location.hostname
+     {
+      const file=_
+      {
+       const _=path_file(file)
+       {
+        const file=_
+        {
+         return replace(file,".","-")
+        }
+       }
+      }
+     }
+    }
+    else
+    {
+     stop()
+    }
+   }
+   if(is_browser())
+   {
+    window.global=window
+   }
+   global.caught=false
+   global.start=time_get()
+   global.digit="0123456789"
+   global.lower="abcdefghijklmnopqrstuvwxyz"
+   global.upper=to_upper(lower)
+   if(is_node())
+   {
+    const _=slice(process.argv,2)
+    {
+     const a=_
+     {
+      append(parameters,a)
+      pump()
+     }
+    }
+   }
+   else if(is_browser())
+   {
+    const _=false
+    {
+     let skip=_
+     {
+      function on_load()
+      {
+       if(skip)
+       {
+        return
+       }
+       if(same(document.readyState,"complete"))
+       {
+        pump()
+        skip=true
+       }
+      }
+      window.onload=on(on_load)
+     }
+    }
+   }
+   else
+   {
+    stop()
+   }
+  }
+ }
+}
+function map(x,y)
+{
+ check(is_arr,x)
+ check(is_fn,y)
+ const r=arr()
+ for(const v of x)
+ {
+  const v2=y(v)
+  check(is_def,v2)
+  push(r,v2)
+ }
+ return r
+}
+function match_l(x,y)
+{
+ check(is_str,x)
+ check(is_str,y)
+ if(is_empty(x))
+  return false
+ if(is_empty(y))
+  return false
+ if(gt(y.length,x.length))
+  return false
+ const s=slice_l(x,y.length)
+ return same(s,y)
+}
+function match_r(x,y)
+{
+ check(is_str,x)
+ check(is_str,y)
+ if(is_empty(x))
+  return false
+ if(is_empty(y))
+  return false
+ if(gt(y.length,x.length))
+  return false
+ const s=slice_r(x,y.length)
+ return same(s,y)
+}
+function match(x,y)
+{
+ check(is_str,x)
+ check(is_str,y)
+ let s=replace(y,".","\\.")
+ s=replace(s,"*",".*")
+ s=concat("^",s,"$")
+ const o=new RegExp(s)
+ return o.test(x)
+}
+function max(...x)
+{
+ return Math.max(...x)
+}
+function merge(x,y)
+{
+ check(is_obj,x)
+ check(is_obj,y)
+ Object.assign(x,y)
+}
+function min(...x)
+{
+ return Math.min(...x)
+}
+function mul(x,y,...z)
+{
+ check(is_num,x)
+ check(is_num,y)
+ const r=x*y
+ if(is_full(z))
+  return mul(r,...z)
+ return r
+}
+function nop()
+{
+}
+function obj_keys(x)
+{
+ check(is_obj,x)
+ return Object.keys(x)
+}
+function obj_vals(x)
+{
+ check(is_obj,x)
+ return Object.values(x)
+}
+function obj()
+{
+ return {}
+}
+function on(x)
+{
+ check(is_fn,x)
+ const fn=x
+ function on_fn()
+ {
+  if(caught)
+   return
+  try
+  {
+   return fn()
+  }
+  catch(e)
+  {
+   caught=true
+   throw e
+  }
+ }
+ check(!caught)
+ return on_fn
+}
+function pad_l(x,y,z)
+{
+ check(is_cool,x)
+ if(is_uint(x))
+ {
+  const s=to_json(x)
+  if(is_undef(y))
+  {
+   if(is_undef(z))
+    return pad_l(s,"0",3)
+   return pad_l(s,"0",z)
+  }
+  return pad_l(s,y,z)
+ }
+ check(is_str,x)
+ check(is_str,y)
+ check(is_uint,z)
+ return x.padStart(z,y)
+}
+function pad_r(x,y,z)
+{
+ check(is_cool,x)
+ if(is_uint(x))
+ {
+  const s=to_json(x)
+  if(is_undef(y))
+  {
+   if(is_undef(z))
+    return pad_r(s,"0",3)
+   return pad_r(s,"0",z)
+  }
+  return pad_r(s,y,z)
+ }
+ check(is_str,x)
+ check(is_str,y)
+ check(is_uint,z)
+ return x.padEnd(z,y)
+}
+function paren(x)
+{
+ check(is_str,x)
+ return concat("(",x,")")
+}
+function path_concat(x,y)
+{
+ const s1=strip_r(x,"/")
+ const s2=strip_l(y,"/")
+ return concat(s1,"/",s2)
+}
+function path_file(x)
+{
+ check(is_str,x)
+ const s=path_base(x)
+ const a=split(s,".")
+ if(is_single(a))
+  return s
+ drop(a)
+ return join(a,".")
+}
+function path_fix(x)
+{
+ if(match_r(x,"/"))
+  return x
+ return concat(x,"/")
+}
+function pop(x,y)
+{
+ check(is_arr,x)
+ if(is_undef(y))
+  return pop(x,1)
+ check(is_uint,y)
+ const n=sub(x.length,y)
+ if(same(y,1))
+ {
+  const r=back(x)
+  remove(x,n,1)
+  return r
+ }
+ remove(x,n,y)
+}
+function prepend(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ const a=dup(y)
+ reverse(a)
+ for(const v of a)
+ {
+  unshift(x,v)
+ }
+}
+function push(x,y)
+{
+ check(is_arr,x)
+ check(is_def,y)
+ x.push(y)
+}
+function put(x,y,z)
+{
+ check(is_obj,x)
+ check(is_str,y)
+ check(is_def,z)
+ if(has(x,y))
+  stop()
+ set(x,y,z)
+}
+function random(x)
+{
+ if(is_undef(x))
+  return random(Number.MAX_SAFE_INTEGER)
+ check(is_num,x)
+ check(gte,x,0)
+ let r=Math.random()
+ r=mul(r,x)
+ if(is_uint(x))
+  return trunc(r)
+ return r
+}
+function reject(x,y)
+{
+ check(is_arr,x)
+ check(is_fn,y)
+ const r=arr()
+ for(const v of x)
+ {
+  if(y(v))
+   continue
+  push(r,v)
+ }
+ return r
+}
+function remove(x,y,z)
+{
+ check(is_arr,x)
+ check(is_uint,y)
+ if(is_undef(z))
+  return remove(x,y,1)
+ check(is_uint,z)
+ check(between,y,0,x.length)
+ const n=add(y,z)
+ check(between,n,0,x.length)
+ x.splice(y,z)
+}
+function repeat(x,y)
+{
+ check(is_str,x)
+ check(is_uint,y)
+ return x.repeat(y)
+}
+function replace_rec(x,y,z)
+{
+ check(is_str,x)
+ check(is_str,y)
+ check(is_str,z)
+ let r=x
+ while(contain(r,y))
+ {
+  r=replace(r,y,z)
+ }
+ return r
+}
+function replace(x,y,z)
+{
+ check(is_str,x)
+ check(is_str,y)
+ check(is_str,z)
+ const a=split(x,y)
+ return join(a,z)
+}
+function reverse(x)
+{
+ check(is_arr,x)
+ x.reverse()
+}
+function round(x)
+{
+ check(is_num,x)
+ return Math.round(x)
+}
+function salt(x,y)
+{
+ check(is_str,x)
+ if(is_undef(y))
+  return salt(x,"azertyuiop")
+ let r=""
+ const a1=explode(x)
+ const a2=explode(y)
+ while(is_full(a1))
+ {
+  if(is_empty(a2))
+  {
+   const a3=explode(y)
+   append(a2,a3)
+  }
+  const c1=shift(a1)
+  const c2=shift(a2)
+  const n1=asc(c1)
+  const n2=asc(c2)
+  const n=n1^n2
+  const c=chr(n)
+  r=concat(r,c)
+ }
+ return r
+}
+function same(x,y)
+{
+ return x===y
+}
+function scan(x,y)
+{
+ check(is_str,x)
+ if(is_undef(y))
+  return scan(x,is_token)
+ check(is_fn,y)
+ function delimit(x)
+ {
+  check(is_str,x)
+  const r=arr()
+  for(const v of x)
+  {
+   const right=v
+   if(is_empty(r))
+   {
+    push(r,right)
+    continue
+   }
+   const left=back(r)
+   const fragment=concat(left,right)
+   if(is_fragment(fragment))
+   {
+    drop(r)
+    push(r,fragment)
+   }
+   else
+    push(r,right)
+  }
+  return r
+ }
+ function group(x,y)
+ {
+  check(is_arr,x)
+  check(is_fn,y)
+  const r=arr()
+  const fragments=dup(x)
+  while(is_full(fragments))
+  {
+   const a=reduce(fragments,y)
+   if(is_full(a))
+   {
+    const s=implode(a)
+    push(r,s)
+    shift(fragments,a.length)
+   }
+   else
+   {
+    const s=shift(fragments)
+    push(r,s)
+   }
+  }
+  return r
+ }
+ function reduce(x)
+ {
+  check(is_arr,x)
+  check(is_fn,y)
+  check(is_full,x)
+  const r=dup(x)
+  while(is_full(r))
+  {
+   const s=implode(r)
+   if(y(s))
+    break
+   drop(r)
+  }
+  return r
+ }
+ const a=delimit(x)
+ return group(a,y)
+}
+function set(x,y,z)
+{
+ check(is_obj,x)
+ check(is_str,y)
+ check(is_def,z)
+ x[y]=z
+}
+function shift(x,y)
+{
+ check(is_arr,x)
+ if(is_undef(y))
+  return shift(x,1)
+ check(is_uint,y)
+ if(same(y,1))
+ {
+  const r=front(x)
+  remove(x,0,1)
+  return r
+ }
+ remove(x,0,y)
+}
+function slice_l(x,y)
+{
+ check(is_vec,x)
+ check(is_uint,y)
+ return slice(x,0,y)
+}
+function slice_r(x,y)
+{
+ check(is_vec,x)
+ check(is_uint,y)
+ const n=sub(x.length,y)
+ return slice(x,n,y)
+}
+function slice(x,y,z)
+{
+ check(is_vec,x)
+ const n1=inc(x.length)
+ check(between,y,0,n1)
+ if(is_undef(z))
+ {
+  const n=sub(x.length,y)
+  return slice(x,y,n)
+ }
+ check(between,z,0,n1)
+ const n2=add(y,z)
+ check(between,n2,0,n1)
+ return x.slice(y,n2)
+}
+function sort(x,y)
+{
+ check(is_arr,x)
+ if(is_undef(y))
+  x.sort()
+ else
+  x.sort(y)
+}
+function space(...x)
+{
+ return join(x," ")
+}
+function split(x,y)
+{
+ check(is_str,x)
+ if(is_undef(y))
+  return split(x,"\n")
+ if(is_empty(x))
+  return arr()
+ return x.split(y)
+}
+function stop()
+{
+ throw new Error("stop")
+}
+function str_indent(x)
+{
+ check(is_str,x)
+ if(is_blank(x))
+  return 0
+ const s=trim_l(x)
+ return sub(x.length,s.length)
+}
+function strip_l(x,y)
+{
+ check(is_str,x)
+ check(is_str,y)
+ if(match_l(x,y))
+ {
+  const n=sub(x.length,y.length)
+  return slice_r(x,n)
+ }
+ return x
+}
+function strip_r(x,y)
+{
+ check(is_str,x)
+ check(is_str,y)
+ if(match_r(x,y))
+ {
+  const n=sub(x.length,y.length)
+  return slice_l(x,n)
+ }
+ return x
+}
+function sub(x,y,...z)
+{
+ check(is_num,x)
+ check(is_num,y)
+ const r=x-y
+ if(is_full(z))
+  return sub(r,...z)
+ return r
+}
+function tail(x,y)
+{
+ check(is_arr,x)
+ check(is_uint,y)
+ if(lt(x.length,y))
+  return dup(x)
+ return slice_r(x,y)
+}
+function time_get()
+{
+ const n=Date.now()
+ return div(n,1000)
+}
+function time_interval(x,y)
+{
+ check(is_fn,x)
+ if(is_undef(y))
+  return time_interval(x,0)
+ check(is_num,y)
+ check(gte,y,0)
+ const fn=x
+ function on_interval()
+ {
+  if(caught)
+   return
+  try
+  {
+   return fn()
+  }
+  catch(e)
+  {
+   caught=true
+   throw e
+  }
+ }
+ check(!caught)
+ const n=mul(y,1000)
+ setInterval(on_interval,n)
+}
+function time_now()
+{
+ const n=time_get()
+ return sub(n,start)
+}
+function time_timeout(x,y)
+{
+ check(is_fn,x)
+ if(is_undef(y))
+  return time_timeout(x,0)
+ check(is_num,y)
+ check(gte,y,0)
+ const fn=x
+ function on_timeout()
+ {
+  if(caught)
+   return
+  try
+  {
+   return fn()
+  }
+  catch(e)
+  {
+   caught=true
+   throw e
+  }
+ }
+ check(!caught)
+ const n=mul(y,1000)
+ setTimeout(on_timeout,n)
+}
+function to_dump(x)
+{
+ check(is_def,x)
+ return JSON.stringify(x,null,1)
+}
+function to_fixed(x,y)
+{
+ check(is_num,x)
+ if(is_undef(y))
+  return to_fixed(x,2)
+ check(is_uint,y)
+ const s=x.toFixed(y)
+ const a=split(s,".")
+ if(is_single(a))
+  return s
+ const integer=front(a)
+ let float=back(a)
+ const digits=explode(float)
+ while(is_full(digits))
+ {
+  const c=back(digits)
+  if(different(c,"0"))
+   break
+  drop(digits)
+ }
+ if(is_empty(digits))
+  return integer
+ float=implode(digits)
+ return concat(integer,".",float)
+}
+function to_i(x)
+{
+ check(is_str,x)
+ return Number.parseInt(x)
+}
+function to_int(x)
+{
+ check(is_str,x)
+ const r=to_num(x)
+ check(is_int,r)
+ return r
+}
+function to_json(x)
+{
+ check(is_def,x)
+ return json_encode(x)
+}
+function to_lit(x)
+{
+ check(is_str,x)
+ return json_encode(x)
+}
+function to_lower(x)
+{
+ check(is_str,x)
+ return x.toLowerCase()
+}
+function to_num(x)
+{
+ check(is_str,x)
+ const r=json_decode(x)
+ check(is_num,r)
+ return r
+}
+function to_uint(x)
+{
+ check(is_str,x)
+ const r=to_int(x)
+ check(is_uint,r)
+ return r
+}
+function to_upper(x)
+{
+ check(is_str,x)
+ return x.toUpperCase()
+}
+function trim_l(x)
+{
+ check(is_str,x)
+ return x.trimStart()
+}
+function trim_r(x)
+{
+ check(is_str,x)
+ return x.trimEnd()
+}
+function trim(x)
+{
+ check(is_str,x)
+ return x.trim()
+}
+function trunc(x)
+{
+ check(is_num,x)
+ return Math.trunc(x)
+}
+function unshift(x,y)
+{
+ check(is_arr,x)
+ check(is_def,y)
+ x.unshift(y)
+}
+function unwrap(x)
+{
+ check(is_str,x)
+ if(is_lit(x))
+  return json_decode(x)
+ if(is_access(x))
+  return split(x,".")
+ if(is_tuple(x))
+  return split(x,":")
+ stop()
+}
+function app_compile(x)
+{
+ check(is_str,x)
+ let nodes=x
+ nodes=pass_parse(nodes)
+ nodes=pass_fold(nodes)
+ nodes=pass_scope(nodes)
+ return pass_block(nodes)
+}
+function app_home(x)
+{
+ check(is_str,x)
+ const lines=arr()
+ const js=app_make(x)
+ push(lines,"<!doctype html>")
+ push(lines,"<script>")
+ push(lines,js)
+ push(lines,"</script>")
+ return join(lines)
+}
+function app_make(x)
+{
+ check(is_str,x)
+ function get_js(x)
+ {
+  check(is_str,x)
+  const r=arr()
+  const s=file_read(x)
+  for(const v of split(s))
+  {
+   const s=trim_r(v)
+   if(is_empty(s))
+    continue
+   push(r,s)
+  }
+  return r
+ }
+ function get_files(x)
+ {
+  check(is_arr,x)
+  const r=arr()
+  for(const v of x)
+  {
+   const a=dir_load(v)
+   append(r,a)
+  }
+  return r
+ }
+ function get_includes(x)
+ {
+  check(is_str,x)
+  const r=arr()
+  const app=concat("src/app-",x)
+  let a=path_concat(app,"include.txt")
+  a=file_read(a)
+  a=trim(a)
+  for(const v of split(a))
+  {
+   const s=path_concat("src",v)
+   push(r,s)
+  }
+  push(r,app)
+  return r
+ }
+ const includes=get_includes(x)
+ const lines=arr()
+ for(const v of get_files(includes))
+ {
+  const ext=path_ext(v)
+  if(same(ext,"js"))
+  {
+   const a=get_js(v)
+   append(lines,a)
+  }
+  else if(same(ext,"cs"))
+  {
+   const s=file_read(v)
+   const js=app_compile(s)
+   const a=split(js)
+   append(lines,a)
+  }
+ }
+ push(lines,"main()")
+ return join(lines)
+}
+function ast_assign(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,y)
+ const left=front(x)
+ check(is_name,left)
+ const right=slice(x,1)
+ const rvalue=expr_rvalue(...right)
+ return concat(left,"=",rvalue)
+}
+function ast_begin(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,x)
+ const s=ast_block(y)
+ return s
+}
+function ast_block(x)
+{
+ check(is_arr,x)
+ let s=x
+ s=pass_block(s)
+ s=indent(s)
+ if(is_empty(s))
+  return "{\n}"
+ return concat("{\n",s,"\n}")
+}
+function ast_brk(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,x)
+ check(is_empty,y)
+ return "break"
+}
+function ast_call(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_full,x)
+ check(is_empty,y)
+ return expr_call(...x)
+}
+function ast_catch(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ const block=ast_block(y)
+ if(is_empty(x))
+  return concat("catch\n",block)
+ check(is_single,x)
+ const identifier=front(x)
+ check(is_identifier,identifier)
+ const list=paren(identifier)
+ return concat("catch",list,"\n",block)
+}
+function ast_check(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,y)
+ let r=x
+ r=join(r,",")
+ r=paren(r)
+ r=concat("check",r)
+ return r
+}
+function ast_cont(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,x)
+ check(is_empty,y)
+ return "continue"
+}
+function ast_declare(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,y)
+ const left=front(x)
+ const right=slice(x,1)
+ const rvalue=expr_rvalue(...right)
+ return concat(left,"=",rvalue)
+}
+function ast_else(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,x)
+ const block=ast_block(y)
+ return concat("else\n",block)
+}
+function ast_elseif(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ const rvalue=expr_rvalue(...x)
+ const list=paren(rvalue)
+ const block=ast_block(y)
+ return concat("else if",list,"\n",block)
+}
+function ast_fn(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ return ast_xn(x,y,"function")
+}
+function ast_forin(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ const rvalue=expr_rvalue(...x)
+ const s=space("const k in",rvalue)
+ const list=paren(s)
+ const block=ast_block(y)
+ return concat("for",list,"\n",block)
+}
+function ast_fornum(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ const rvalue=expr_rvalue(...x)
+ const s=concat("let i=0;i<",rvalue,";i++")
+ const list=paren(s)
+ const block=ast_block(y)
+ return concat("for",list,"\n",block)
+}
+function ast_forof(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ const rvalue=expr_rvalue(...x)
+ const s=space("const v of",rvalue)
+ const list=paren(s)
+ const block=ast_block(y)
+ return concat("for",list,"\n",block)
+}
+function ast_gn(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ return ast_xn(x,y,"function*")
+}
+function ast_if(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ const rvalue=expr_rvalue(...x)
+ const list=paren(rvalue)
+ const block=ast_block(y)
+ return concat("if",list,"\n",block)
+}
+function ast_include(x,y)
+{
+ check(is_obj,x)
+ check(is_str,y)
+ const parameters=x.parameters
+ const children=x.children
+ check(is_single,parameters)
+ check(is_empty,children)
+ const s=front(parameters)
+ check(is_lit,s)
+ const include=unwrap(s)
+ if(match_l(include,"/"))
+  return pass_parse(include)
+ const path=path_concat(y,include)
+ return pass_parse(path)
+}
+function ast_inline(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_single,x)
+ check(is_empty,y)
+ const first=front(x)
+ check(is_lit,first)
+ return unwrap(first)
+}
+function ast_let(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_many,x)
+ check(is_empty,y)
+ const s=ast_declare(x,y)
+ return space("const",s)
+}
+function ast_ret(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,y)
+ if(is_empty(x))
+  return "return"
+ const rvalue=expr_rvalue(...x)
+ return space("return",rvalue)
+}
+function ast_run(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_full,x)
+ check(is_empty,y)
+ const call=expr_call(...x)
+ return space("yield*",call)
+}
+function ast_throw(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,y)
+ const rvalue=expr_rvalue(...x)
+ return space("throw",rvalue)
+}
+function ast_translate(x)
+{
+ check(is_obj,x)
+ function translate(x,y,z)
+ {
+  check(is_str,x)
+  check(is_arr,y)
+  check(is_arr,z)
+  if(same(x,"begin"))
+   return ast_begin(y,z)
+  else if(same(x,"let"))
+   return ast_let(y,z)
+  else if(same(x,"var"))
+   return ast_var(y,z)
+  else if(same(x,"fn"))
+   return ast_fn(y,z)
+  else if(same(x,"gn"))
+   return ast_gn(y,z)
+  else if(same(x,"ret"))
+   return ast_ret(y,z)
+  else if(same(x,"if"))
+   return ast_if(y,z)
+  else if(same(x,"elseif"))
+   return ast_elseif(y,z)
+  else if(same(x,"else"))
+   return ast_else(y,z)
+  else if(same(x,"while"))
+   return ast_while(y,z)
+  else if(same(x,"brk"))
+   return ast_brk(y,z)
+  else if(same(x,"cont"))
+   return ast_cont(y,z)
+  else if(same(x,"throw"))
+   return ast_throw(y,z)
+  else if(same(x,"try"))
+   return ast_try(y,z)
+  else if(same(x,"catch"))
+   return ast_catch(y,z)
+  else if(same(x,"check"))
+   return ast_check(y,z)
+  else if(same(x,"assign"))
+   return ast_assign(y,z)
+  else if(same(x,"inline"))
+   return ast_inline(y,z)
+  else if(same(x,"forof"))
+   return ast_forof(y,z)
+  else if(same(x,"forin"))
+   return ast_forin(y,z)
+  else if(same(x,"fornum"))
+   return ast_fornum(y,z)
+  else if(same(x,"call"))
+   return ast_call(y,z)
+  else if(same(x,"yield"))
+   return ast_yield(y,z)
+  else if(same(x,"run"))
+   return ast_run(y,z)
+  else
+  {
+   const call=arr(x,...y)
+   return ast_call(call,z)
+  }
+ }
+ const operator=x.operator
+ const parameters=x.parameters
+ const children=x.children
+ try
+ {
+  return translate(operator,parameters,children)
+ }
+ catch(e)
+ {
+  log("operator",to_lit(operator))
+  if(is_full(parameters))
+   log(" parameters",...parameters)
+  throw e
+ }
+}
+function ast_try(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,x)
+ const block=ast_block(y)
+ return concat("try\n",block)
+}
+function ast_var(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_many,x)
+ check(is_empty,y)
+ const s=ast_declare(x,y)
+ return space("let",s)
+}
+function ast_while(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ const rvalue=expr_rvalue(...x)
+ const list=paren(rvalue)
+ const block=ast_block(y)
+ return concat("while",list,"\n",block)
+}
+function ast_xn(x,y,z)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_str,z)
+ function get_argument(x)
+ {
+  check(is_str,x)
+  if(is_identifier(x))
+   return x
+  if(is_tuple(x))
+  {
+   const a=unwrap(x)
+   check(is_pair,a)
+   const name=front(a)
+   const etc=back(a)
+   check(is_identifier,name)
+   check(same,etc,"etc")
+   return concat("...",name)
+  }
+  stop()
+ }
+ const name=front(x)
+ check(is_name,name)
+ const a=slice(x,1)
+ const arguments=map(a,get_argument)
+ const s=join(arguments,",")
+ const list=paren(s)
+ const call=concat(name,list)
+ const xn=space(z,call)
+ const block=ast_block(y)
+ return concat(xn,"\n",block)
+}
+function ast_yield(x,y)
+{
+ check(is_arr,x)
+ check(is_arr,y)
+ check(is_empty,y)
+ if(is_empty(x))
+  return "yield"
+ const rvalue=expr_rvalue(...x)
+ return space("yield",rvalue)
+}
+function expr_arr(...x)
+{
+ const s=join(x,",")
+ return bracket(s)
+}
+function expr_call(x,...y)
+{
+ check(is_name,x)
+ function get_argument(x)
+ {
+  check(is_str,x)
+  if(is_numeric(x))
+   return x
+  if(is_lit(x))
+   return x
+  if(is_identifier(x))
+   return x
+  if(is_access(x))
+   return x
+  if(is_tuple(x))
+  {
+   const a=unwrap(x)
+   check(is_pair,a)
+   const name=front(a)
+   const etc=back(a)
+   check(is_identifier,name)
+   check(same,etc,"etc")
+   return concat("...",name)
+  }
+  log("argument",to_lit(x))
+  stop()
+ }
+ const arguments=map(y,get_argument)
+ const s=join(arguments,",")
+ const list=paren(s)
+ return concat(x,list)
+}
+function expr_in(x,y,...z)
+{
+ check(is_identifier,x)
+ check(is_identifier,y)
+ check(is_empty,z)
+ return space(y,"in",x)
+}
+function expr_inline(...x)
+{
+ check(is_single,x)
+ const s=front(x)
+ check(is_lit,s)
+ return unwrap(s)
+}
+function expr_instanceof(x,y,...z)
+{
+ check(is_name,x)
+ check(is_identifier,y)
+ check(is_empty,z)
+ return space(x,"instanceof",y)
+}
+function expr_new(...x)
+{
+ const rvalue=expr_rvalue(...x)
+ return space("new",rvalue)
+}
+function expr_obj(...x)
+{
+ check(every,x,is_identifier)
+ const s=join(x,",")
+ return brace(s)
+}
+function expr_run(...x)
+{
+ const call=expr_call(...x)
+ return space("yield*",call)
+}
+function expr_rvalue(...x)
+{
+ const first=front(x)
+ if(is_single(x))
+ {
+  if(same(first,"arr"))
+   return expr_arr()
+  else if(same(first,"obj"))
+   return expr_obj()
+  else
+   return first
+ }
+ const arguments=slice(x,1)
+ if(same(first,"call"))
+  return expr_call(...arguments)
+ else if(same(first,"run"))
+  return expr_run(...arguments)
+ else if(same(first,"arr"))
+  return expr_arr(...arguments)
+ else if(same(first,"obj"))
+  return expr_obj(...arguments)
+ else if(same(first,"new"))
+  return expr_new(...arguments)
+ else if(same(first,"in"))
+  return expr_in(...arguments)
+ else if(same(first,"instanceof"))
+  return expr_instanceof(...arguments)
+ else if(same(first,"inline"))
+  return expr_inline(...arguments)
+ else if(same(first,"not"))
+ {
+  const rvalue=expr_rvalue(...arguments)
+  return concat("!",rvalue)
+ }
+ else
+  return expr_call(...x)
+}
+function pass_block(x)
+{
+ check(is_arr,x)
+ const a=arr()
+ for(const v of x)
+ {
+  const s=ast_translate(v)
+  push(a,s)
+ }
+ return join(a)
+}
+function pass_fold(x)
+{
+ check(is_arr,x)
+ function visit(x)
+ {
+  check(is_arr,x)
+  const parent=shift(x)
+  const indent=parent.indent
+  const descendants=arr()
+  while(is_full(x))
+  {
+   const o=front(x)
+   if(gt(o.indent,indent))
+   {
+    shift(x)
+    push(descendants,o)
+   }
+   else
+    break
+  }
+  const children=arr()
+  while(is_full(descendants))
+  {
+   const o=visit(descendants)
+   push(children,o)
+  }
+  const operator=parent.operator
+  const parameters=parent.parameters
+  return {operator,parameters,children}
+ }
+ const r=arr()
+ const lines=dup(x)
+ while(is_full(lines))
+ {
+  const o=visit(lines)
+  push(r,o)
+ }
+ return r
+}
+function pass_parse(x)
+{
+ check(is_str,x)
+ const r=arr()
+ for(const v of split(x))
+ {
+  const line=trim_l(v)
+  const indent=sub(v.length,line.length)
+  const a1=scan(line)
+  const parameters=reject(a1,is_trivia)
+  if(is_empty(parameters))
+   continue
+  const operator=shift(parameters)
+  if(same(operator,"end"))
+  {
+   if(is_empty(parameters))
+    continue
+  }
+  const children=arr()
+  const node={indent,operator,parameters,children}
+  push(r,node)
+ }
+ return r
+}
+function pass_scope(x)
+{
+ check(is_arr,x)
+ function is_declare(x)
+ {
+  if(same(x,"let"))
+   return true
+  if(same(x,"var"))
+   return true
+  return false
+ }
+ const r=arr()
+ const a=dup(x)
+ while(is_full(a))
+ {
+  const node=shift(a)
+  const operator=node.operator
+  const parameters=node.parameters
+  const declare=operator
+  let name=null
+  let rvalue=null
+  if(is_full(parameters))
+  {
+   name=front(parameters)
+   rvalue=slice(parameters,1)
+  }
+  if(is_declare(operator))
+  {
+   check(is_str,name)
+   check(is_arr,rvalue)
+   let operator="let"
+   let parameters=arr("_",...rvalue)
+   let children=arr()
+   const node2={operator,parameters,children}
+   push(r,node2)
+   operator="begin"
+   parameters=arr()
+   children=arr()
+   const node3={operator,parameters,children}
+   push(r,node3)
+   operator=declare
+   parameters=arr(name,"_")
+   children=arr()
+   const node4={operator,parameters,children}
+   push(node3.children,node4)
+   operator="begin"
+   parameters=arr()
+   children=pass_scope(a)
+   const node5={operator,parameters,children}
+   push(node3.children,node5)
+   clear(a)
+  }
+  else
+  {
+   const children=pass_scope(node.children)
+   const node2={operator,parameters,children}
+   push(r,node2)
+  }
+ }
+ return r
+}
+const cp=require("child_process")
+const fs=require("fs")
+const http=require('http')
+const os=require("os")
+const path=require("path")
+const util=require("util")
+function dir_change(x)
+{
+ check(is_str,x)
+ process.chdir(x)
+}
+function dir_current()
+{
+ return process.cwd()
+}
+function dir_load(x)
+{
+ check(is_str,x)
+ const r=arr()
+ for(const v of dir_read(x,true))
+ {
+  if(is_file(v))
+   push(r,v)
+  else if(is_dir(v))
+  {
+   const a=dir_load(v)
+   append(r,a)
+  }
+  else
+   stop()
+ }
+ return r
+}
+function dir_make(x)
+{
+ check(is_str,x)
+ const recursive=true
+ const o={recursive}
+ fs.mkdirSync(x,o)
+}
+function dir_read(x,y)
+{
+ check(is_str,x)
+ if(is_undef(y))
+  return dir_read(x,false)
+ const r=arr()
+ const dir=path_real(x)
+ for(const v of fs.readdirSync(dir))
+ {
+  const s=path_concat(dir,v)
+  if(is_file(s))
+  {
+   push(r,s)
+   continue
+  }
+  if(y)
+  {
+   if(is_dir(s))
+    push(r,s)
+  }
+ }
+ return r
+}
+function dir_remove(x)
+{
+ check(is_str,x)
+ const recursive=true
+ const o={recursive}
+ fs.rmdirSync(x,o)
+}
+function dir_reset(x)
+{
+ check(is_str,x)
+ fs_remove(x)
+ dir_make(x)
+}
+function dir_size(x)
+{
+ check(is_str,x)
+ let r=0
+ for(const v of dir_load(x))
+ {
+  const n=file_size(v)
+  r=add(r,n)
+ }
+ return r
+}
+function file_read(x)
+{
+ check(is_str,x)
+ const o=fs.readFileSync(x)
+ return o.toString()
+}
+function file_save(x,y)
+{
+ check(is_str,x)
+ check(is_str,y)
+ if(is_file(x))
+ {
+  const s=file_read(x)
+  if(same(s,y))
+   return
+ }
+ const dir=path_dir(x)
+ if(!is_dir(dir))
+  dir_make(dir)
+ file_write(x,y)
+}
+function file_size(x)
+{
+ check(is_str,x)
+ const v=fs.statSync(x)
+ return v.size
+}
+function file_write(x,y)
+{
+ check(is_str,x)
+ check(is_str,y)
+ fs.writeFileSync(x,y)
+}
+function flower(x)
+{
+ check(is_str,x)
+ const n=process.stdout.columns
+ let s1=repeat("*",n)
+ let s2=repeat("*",2)
+ s2=concat(s2," ")
+ s2=concat(s2,x)
+ s2=concat(s2," ")
+ s2=concat(s2,s1)
+ s2=slice_l(s2,n)
+ log(s2)
+}
+function fs_copy(x,y)
+{
+ check(is_str,x)
+ check(is_str,x)
+ if(is_file(x))
+ {
+  if(is_dir(y))
+  {
+   const base=path_base(x)
+   const path=path_concat(y,base)
+   fs_copy(x,path)
+   return
+  }
+ }
+ const force=true
+ const recursive=true
+ const o={force,recursive}
+ fs.cpSync(x,y,o)
+}
+function fs_remove(x)
+{
+ check(is_str,x)
+ const force=true
+ const recursive=true
+ const o={force,recursive}
+ fs.rmSync(x,o)
+}
+function ip_list()
+{
+ const s=os_execute("hostname","--all-ip-addresses")
+ return split(s," ")
+}
+function is_dir(x)
+{
+ if(!is_str(x))
+  return false
+ const throwIfNoEntry=false
+ const o={throwIfNoEntry}
+ const v=fs.statSync(x,o)
+ if(is_undef(v))
+  return false
+ return v.isDirectory()
+}
+function is_file(x)
+{
+ if(!is_str(x))
+  return false
+ const throwIfNoEntry=false
+ const o={throwIfNoEntry}
+ const v=fs.statSync(x,o)
+ if(is_undef(v))
+  return false
+ return v.isFile()
+}
+function is_fs(x)
+{
+ if(!is_str(x))
+  return false
+ const throwIfNoEntry=false
+ const o={throwIfNoEntry}
+ const v=fs.statSync(x,o)
+ return is_def(v)
+}
+function is_readable(x)
+{
+ if(is_file(x))
+ {
+  let fd=null
+  try
+  {
+   fd=fs.openSync(x)
+  }
+  catch
+  {
+   return false
+  }
+  const n=file_size(x)
+  if(gt(n,0))
+  {
+   const buffer=Buffer.alloc(1)
+   try
+   {
+    fs.readSync(fd,buffer)
+   }
+   catch
+   {
+    fs.closeSync(fd)
+    return false
+   }
+  }
+  fs.closeSync(fd)
+  return true
+ }
+ else if(is_dir(x))
+ {
+  try
+  {
+   fs.readdirSync(x)
+  }
+  catch
+  {
+   return false
+  }
+  return true
+ }
+ else
+ {
+  return false
+ }
+}
+function os_detach(x,...y)
+{
+ check(is_str,x)
+ const detached=true
+ const stdio="ignore"
+ const option={detached,stdio}
+ const o=cp.spawn(x,y,option)
+ o.unref()
+}
+function os_execute(x,...y)
+{
+ check(is_str,x)
+ const maxBuffer=mul(1,1024,1024,1024)
+ const encoding="utf8"
+ const o={maxBuffer,encoding}
+ const streams=cp.spawnSync(x,y,o)
+ let out=streams.stdout.toString()
+ let err=streams.stderr.toString()
+ out=trim_r(out)
+ err=trim_r(err)
+ const a=arr()
+ if(is_full(out))
+  push(a,out)
+ if(is_full(err))
+  push(a,err)
+ return join(a)
+}
+function os_home()
+{
+ return os.homedir()
+}
+function os_shell(...x)
+{
+ const result=os_execute(...x)
+ let command=join(x," ")
+ command=to_lit(command)
+ log("shell",command)
+ for(const v of split(result))
+ {
+  log(" >",v)
+ }
+}
+function os_spawn(x,...y)
+{
+ check(is_str,x)
+ const detached=true
+ const stdio="ignore"
+ const o={detached,stdio}
+ cp.spawn(x,y,o)
+}
+function os_system(x,...y)
+{
+ check(is_str,x)
+ const stdio="inherit"
+ const o={stdio}
+ const result=cp.spawnSync(x,y,o)
+ return result.status
+}
+function os_user()
+{
+ const o=os.userInfo()
+ return o.username
+}
+function path_base(x)
+{
+ check(is_str,x)
+ return path.basename(x)
+}
+function path_dir(x)
+{
+ check(is_str,x)
+ return path.dirname(x)
+}
+function path_ext(x)
+{
+ check(is_str,x)
+ const s=path.extname(x)
+ return strip_l(s,".")
+}
+function path_real(x)
+{
+ check(is_str,x)
+ return fs.realpathSync(x)
+}
+function ssh_execute(...x)
+{
+ return ssh_pass(...x)
+}
+function ssh_pass(x,...y)
+{
+ check(is_str,x)
+ return os_execute("sshpass","-p",x,...y)
+}
+function ssh_system(x,...y)
+{
+ check(is_str,x)
+ const r=ssh_pass(x,...y)
+ const a=split(r)
+ if(is_full(a))
+ {
+  log(...y)
+  for(const v of a)
+  {
+   log(" >",v)
+  }
+ }
+ return r
+}
+function init(...x)
+{
+ function get_apps()
+ {
+  const r=arr()
+  for(const v of dir_read("src",true))
+  {
+   const base=path_base(v)
+   const a=split(base,"-")
+   shift(a)
+   const name=join(a,"-")
+   push(r,name)
+  }
+  return r
+ }
+ function is_app(x)
+ {
+  if(!is_str(x))
+   return false
+  const base=concat("app-",x)
+  const path=path_concat("src",base)
+  return is_dir(path)
+ }
+ const parameters=dup(x)
+ if(is_empty(parameters))
+ {
+  const a=get_apps()
+  dump(a)
+  return
+ }
+ const app=shift(parameters)
+ if(!is_app(app))
+ {
+  const a=get_apps()
+  dump(a)
+  return
+ }
+ let run=true
+ if(extract(parameters,"--compile"))
+  run=false
+ const code=app_make(app)
+ const out=concat("out-",app,".js")
+ const node=process.argv0
+ file_save(out,code)
+ if(run)
+ {
+  dir_reset("tmp")
+  os_system(node,"--trace-uncaught",out,...parameters)
+ }
+}
+main()
