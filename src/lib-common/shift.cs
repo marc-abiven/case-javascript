@@ -1,0 +1,18 @@
+fn shift x y
+ check is_arr x
+
+ if is_undef y
+  ret shift x 1
+
+ check is_uint y
+
+ if same y 1
+  let r front x
+
+  remove x 0 1
+
+  ret value r
+ end
+
+ remove x 0 y
+end
