@@ -1,0 +1,53 @@
+fn csv_load x
+ check is_obj x
+
+ let r arr
+ let paths arr
+
+ forof dir_read x.tmp
+  let base path_base v
+
+  if match base "data-*.csv"
+   push paths v
+ end
+
+ if is_empty paths
+  ret r
+
+ pop paths
+
+ if is_empty paths
+  ret r
+
+ forof paths
+  let content file_read v
+
+  fs_remove v
+
+  let content trim content
+  let lines split content
+
+  shift lines
+
+  forof lines
+   let fields split v ","
+
+   shift fields
+
+   let row arr
+
+   forof fields
+    let n to_num v
+    let n div n 1000
+
+    push row n
+   end
+
+   check same row.length dimension
+
+   push r row
+  end
+ end
+
+ ret r
+end
