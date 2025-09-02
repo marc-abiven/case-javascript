@@ -1,0 +1,176 @@
+fn dbg_origin source line key depth
+ check is_arr source
+ check is_uint line
+
+ if is_undef key
+  ret dbg_origin source line "" depth
+
+ check is_str key
+
+ if is_undef depth
+  ret dbg_origin source line key 15
+
+ check is_uint depth
+
+ fn find_origin fn source line key depth
+  check is_fn fn
+  check is_arr source
+  check is_uint line
+  check is_str key
+  check is_uint depth
+  
+  var n depth
+  var r fn source line key n
+
+  while lte n source.length
+   if gte r.length depth
+    brk
+
+   assign n inc n
+   assign r fn source line key n
+
+   let end add line r.length
+   
+   if gte end source.length
+    brk
+  end
+  
+  ret r
+ end
+
+ fn origin source line key depth
+  check is_arr source
+  check is_uint line
+  check is_str key
+  check is_uint depth
+
+  let r arr
+  let a arr
+
+  let n div depth 2
+  let n trunc n
+  var n sub line n
+
+  let length min source.length depth
+
+  let nup add n length
+
+  if lt n 1
+   assign n 1
+  elseif gte nup source.length
+   assign n sub source.length length
+   assign n inc n
+
+   if lt n 1
+    assign n 1
+  end
+  
+  fornum length
+   let n add n i
+   var p " "
+
+   if same n line
+    assign p ">"
+
+   let index dec n
+   var code at source index
+
+   if is_empty key
+    check is_str code
+   else
+    assign code get code key
+
+    check is_str code
+   end
+
+   let o obj n p code
+
+   push a o
+  end
+
+  let a2 arr
+
+  forof a
+   push a2 v.code
+  end
+
+  let s join a2
+
+  let s str_unindent s
+  let a3 split s
+
+  forin a3
+   let i to_i k
+   let code at a3 i
+   let o at a i
+
+   assign o.code code
+  end
+
+  forof a
+   if is_empty v.code
+    cont
+
+   push r v
+  end
+
+  ret r
+ end
+
+ fn origin_center source line key depth
+  check is_arr source
+  check is_uint line
+  check is_str key
+  check is_uint depth
+  
+  let a origin source line key depth
+  
+  ret center a
+ end
+ 
+ fn center x
+  check is_arr x
+  
+  var middle get_position x
+
+  var range middle
+  
+  let length mul range 2
+  let length inc length
+  
+  if gt length x.length
+   assign range sub x.length middle
+   assign range dec range
+
+  let ybefore sub middle range
+  let yafter inc middle   
+
+  let before slice x ybefore range
+  let center at x middle
+  let after slice x yafter range
+  let r arr before:etc center after:etc
+
+  ret r
+ end
+
+ fn get_position x
+  check is_arr x
+    
+  forin x
+   let i to_i k
+   let v at x i
+   
+   if same v.p ">"
+    ret i
+  end
+
+  stop
+ end
+ 
+ let centered find_origin origin_center source line key depth 
+ 
+ if same centered.length depth
+  ret centered
+
+ ret find_origin origin source line key depth
+end
