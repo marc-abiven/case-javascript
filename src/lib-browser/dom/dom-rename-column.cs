@@ -1,0 +1,26 @@
+fn dom_rename_column x:obj y:str z:str
+ //~ check is_obj x
+ //~ check is_str y
+ //~ check is_str z
+
+ check same x.localName "table"
+
+ forof dom_children x
+  check same v.localName "tr"
+
+  let children dom_children v
+
+  forof children
+   let column dom_data_get v "column"
+
+   if same column y
+    dom_data_set v "column" z
+
+    if same v.localName "th"
+     dom_data_set v z
+     dom_text v z
+    end
+   end
+  end
+ end
+end

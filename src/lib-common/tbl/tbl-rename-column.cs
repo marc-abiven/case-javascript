@@ -1,0 +1,27 @@
+fn tbl_rename_column x:arr y:str z:str
+ //~ check is_arr x
+ //~ check is_str y
+ //~ check is_str z
+
+ let t dup x
+
+ clear x
+
+ forof t
+  let row v
+  let o obj
+
+  forin row
+   let v get row k
+
+   if same k y
+    put o z v
+    cont
+   end
+
+   put o k v
+  end
+
+  push x o
+ end
+end
