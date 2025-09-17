@@ -1,0 +1,11 @@
+fn dom_escape x:str
+ var r x
+
+ forin entities
+  let v get entities k
+
+  assign r replace r v k
+ end
+
+ ret r
+end

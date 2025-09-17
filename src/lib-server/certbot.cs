@@ -1,0 +1,116 @@
+fn certbot domains:etc
+ //load config
+ 
+ fn load_config
+  let file "certbot.txt"
+  let data obj
+
+  if is_file file
+   let o file_load file
+   let o json_decode o
+
+   obj_merge data o
+  end
+
+  forof domains
+   if not has data v
+    put data v 0
+  end
+
+  ret obj file data
+ end
+ 
+ //get expiry dates
+
+ fn get_expiry_dates
+  let r obj
+  let lines os_execute "sudo" "certbot" "certificates"
+  let lines trim lines
+  let lines split lines
+  
+  while is_full lines
+   let line shift lines
+   let line trim line
+   let line to_lower line
+   
+   if not match_l line "domains:"
+    cont
+    
+   let domain strip_l line "domains:"
+   let domain trim domain
+
+   let date shift lines
+   let date trim date
+   let date to_lower date
+   let date trim date
+   let date strip_l date "expiry date:"
+   let date trim date
+   let a split date " "
+   let date shift a
+   let time shift a
+   let date space date time
+   let date date_decode date
+   
+   put r domain date
+  end
+  
+  ret r
+ end
+ 
+ //main
+
+ let r obj
+ let config load_config
+ let data config.data
+
+ forin data
+  let v get data k
+  let now time_get
+  let now trunc now
+  let refresh add v day
+
+  if gt refresh now
+   cont
+
+  let s os_execute "sudo" "certbot" "certonly" "--standalone" "--email" author "--agree-tos" "--keep-until-expiring" "--domain" k
+  let s txt_prepend s " > "
+
+  trace k
+  trace s
+
+  set data k now
+ end
+
+ let s json_dump data
+
+ file_save config.file s
+
+ forin data
+  let key path_concat "/etc/letsencrypt/live" k "privkey.pem"
+  let cert path_concat "/etc/letsencrypt/live" k "fullchain.pem"
+
+  let key sudo_read key
+  let cert sudo_read cert
+
+  let o obj key cert
+
+  put r k o
+ end
+ 
+ //display expiry certificates dates
+ 
+ let expiries get_expiry_dates
+ 
+ forin expiries
+  let v get expiries k
+  let domain to_lit k
+  let domain concat "domain=" domain
+  let date time_hn v
+  let date to_lit date
+  let date concat "date=" date
+  
+  log "expiry" domain date
+ end
+ 
+ ret r
+end
