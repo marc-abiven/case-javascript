@@ -1,0 +1,4 @@
+lib-common
+lib-node
+lib-shell
+lib-compiler
