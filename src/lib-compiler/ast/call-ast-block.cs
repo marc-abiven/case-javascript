@@ -1,0 +1,26 @@
+fn call_ast_block cpl:obj children:arr source:obj
+ let r arr
+
+ for cpl_block cpl children
+  let o dup v
+
+  assign o.code txt_indent o.code
+
+  push r o
+ end
+
+ //has a scope on some instructions
+
+ if not cpl_is_leaf cpl children
+  let code "{"
+  let open obj code source
+
+  let code "}"
+  let close obj code source
+
+  unshift r open
+  push r close
+ end
+
+ ret r
+end
