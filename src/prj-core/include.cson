@@ -1,0 +1,27 @@
+obj
+ make
+  www
+  org
+ end
+ browser
+  common
+  compiler
+ end
+ compiler
+  common
+ end
+ node
+  common
+ end
+ shell
+  node
+  www
+ end
+ ui
+  browser
+  www
+ end
+ www
+  common
+ end
+end

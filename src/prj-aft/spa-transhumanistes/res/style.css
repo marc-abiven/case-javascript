@@ -1,0 +1,95 @@
+:root
+{
+ /*--unit: 1.3vw;*/
+ /*--padding: 0.3vw;*/
+ /*--border: 0.1vw;*/
+ --color: #297f75;
+}
+
+body
+{
+ font-family: monospace;
+ font-size: var(--unit);
+}
+
+table.grid,
+table.grid th
+{
+ border:var(--border) solid gainsboro;
+}
+
+table.grid tr.even td
+{
+ background-color: whitesmoke;
+}
+
+table.grid tr.odd td
+{
+ background-color: white;
+}
+
+table.grid td,
+table.grid th
+{
+ padding:var(--padding);
+}
+
+a
+{
+ color: var(--color);
+ text-decoration: none; 
+}
+
+a:hover
+{
+ color: white;
+ background-color: var(--color);
+ text-decoration: none; 
+}
+
+a:has(img):hover
+{
+ background-color: white;
+}
+
+/*wordpress*/
+
+blockquote
+{
+ margin:0;
+ padding-left: var(--unit);
+}
+
+figure
+{
+ margin:0;
+}
+
+ol, p, ul
+{
+ margin:0;
+ padding-bottom: var(--unit);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6
+{
+ margin:0;
+ padding-bottom: var(--unit);
+ font-size: var(--unit);
+}
+
+hr
+{
+ margin:0;
+ margin-bottom: var(--unit);
+}
+
+div.wp-block-spacer
+{
+ padding-bottom: var(--unit);
+}
