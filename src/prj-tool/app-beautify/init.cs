@@ -1,0 +1,50 @@
+fn init x:etc
+ //beautify
+
+ fn beautify x:str
+  let s trim_r x
+  let a arr
+
+  for split s
+   let s replace v nbsp " " //normalize
+   let s replace s "\t" " "
+   let s trim_r s
+
+   push a s
+  end
+
+  ret join a
+ end
+
+ //main
+
+ let modifieds arr
+
+ for dir_load "src"
+  let ext path_ext v
+  var process false
+
+  if same ext "cs"
+   assign process true
+
+  if same ext "txt"
+   assign process true
+
+  if not process
+   cont
+
+  let s1 file_load v
+  let s2 beautify s1
+
+  if same s1 s2
+   cont
+
+  let path path_compact v
+
+  log modifieds.length path
+
+  push modifieds v
+
+  file_save v s2
+ end
+end
