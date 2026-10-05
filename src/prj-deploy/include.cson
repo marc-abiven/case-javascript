@@ -1,0 +1,21 @@
+obj
+ apache-start
+  shell
+ end
+ download
+  shell
+  compiler
+  aft
+ end
+ install
+  org
+ end
+ upgrade
+  www
+  org
+ end
+ upload
+  www
+  org
+ end  
+end

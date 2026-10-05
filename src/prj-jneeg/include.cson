@@ -1,0 +1,13 @@
+obj
+ server-jneeg
+  org
+  jneeg
+ end
+ jneeg
+  www
+ end
+ client-jneeg
+  ui
+  jneeg
+ end
+end
