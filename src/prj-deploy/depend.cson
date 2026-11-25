@@ -1,0 +1,13 @@
+obj
+ install
+  upload
+ end
+ upgrade
+  open-port
+ end
+ upload
+  detach
+  kill
+  server-merlin
+ end
+end
